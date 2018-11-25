@@ -1,8 +1,10 @@
 from math import ceil
 
+
 def centuryFromYear(year):
     decimal_year = year / 100
     return ceil(decimal_year)
+
 
 print(centuryFromYear(1905), 20)
 print(centuryFromYear(1700), 17)

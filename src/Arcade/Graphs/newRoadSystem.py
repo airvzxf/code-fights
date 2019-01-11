@@ -1,6 +1,6 @@
 def newRoadSystem(road_register: list) -> bool:
     """
-    Extract the routes and check if is one of this is broken.
+    Extract the routes and check if one of these are broken.
 
     :param road_register: Complete map (bi-dimensional array) with all the routes.
     :return: True if there is not any broken route.
@@ -8,25 +8,43 @@ def newRoadSystem(road_register: list) -> bool:
     """
 
     routes = mapping_the_sky(road_register)
+    map_route_connected = []
 
-    print("Mapping: ", road_register)
-    print("routes: ", routes)
+    print("\n-------------------------------------------------------------------------------------------------\n")
+    print("Mapping:   ", road_register)
+    print("Routes:    ", routes)
 
-    if len(routes) != len(road_register):
-        print("Broken! The size is not the same.")
-        return False
+    follow_the_rainbow(routes, map_route_connected)
+    is_connected = not broken_routes(routes)
 
-    is_broken = follow_the_rainbow(routes)
-    print("is_broken: ", is_broken)
+    print("")
+    print("map_route_connected: ", map_route_connected)
+    print("routes:              ", routes)
+    print("")
+    print("is_connected: ", is_connected)
 
-    print("\n")
+    return is_connected
 
-    return is_broken
+
+def broken_routes(routes: list) -> bool:
+    """
+    Check if the routes are broken; looking for an empty list.
+
+    :param routes: List of the connected nodes.
+    :return: True if the routes are broken otherwise false
+    :rtype: bool
+    """
+
+    for node in routes:
+        if routes[node]:
+            return True
+
+    return False
 
 
 def mapping_the_sky(universe: list) -> dict:
     """
-    Convert the list map into a route dictionary.
+    Convert the boolean route map into a dictionary route map.
     It converts all the true values in a map, relating the bi-dimensional array with the nodes and connections.
 
     :param universe: The bi-dimensional array with Tru and False values which represent the connections between nodes.
@@ -49,85 +67,83 @@ def mapping_the_sky(universe: list) -> dict:
     return mapping_the_rainbow
 
 
-def follow_the_rainbow(map_route: dict) -> bool:
+def follow_the_rainbow(map_route: dict, map_route_connected: list):
     """
-    Follow every route trying to validate that every route is not broken.
+    Follow all the nodes and extract the connected routes from the map route.
 
-    :param map_route: This dictionary contain all the routes.
-    :return: True if there's not broken routes.
-    :rtype: bool
+    :param map_route: This dictionary contains all the routes.
+    :param map_route_connected: After the deeply extraction this list contains all the connected routes.
     """
 
     for node_index in range(len(map_route)):
-        if not following_deeply(map_route, node_index, node_index, 0):
-            return False
-
-    print(map_route)
-    return True
+        following_deeply(map_route, node_index, node_index, True, map_route_connected)
 
 
-def following_deeply(map_route, actual_index, match_index, counter):
-    counter += 1
-
-    for index in map_route[actual_index]:
-        if index == match_index:
-            array_index = map_route[actual_index].index(index)
-            del map_route[actual_index][array_index]
+def following_deeply(map_route, node, target_node, is_root, connected_nodes):
+    for actual_node in map_route[node].copy():
+        if actual_node == target_node:
+            connected_nodes.append([node])
+            array_index = map_route[node].index(actual_node)
+            del map_route[node][array_index]
             return True
         else:
-            if counter < len(map_route):
-                if following_deeply(map_route, index, match_index, counter):
-                    array_index = map_route[actual_index].index(index)
-                    del map_route[actual_index][array_index]
+
+            if following_deeply(map_route, actual_node, target_node, False, connected_nodes):
+                connected_nodes[-1].append(node)
+                array_index = map_route[node].index(actual_node)
+                del map_route[node][array_index]
+
+                if is_root:
+                    connected_nodes[-1].reverse()
+                else:
                     return True
 
-    if not map_route[actual_index] and counter == 1:
-        return True
+    return False
 
 
-# assert newRoadSystem(
-#     [
-#         [False, True, False, False],
-#         [False, False, True, False],
-#         [True, False, False, True],
-#         [False, False, True, False]
-#     ]
-# ) is True
-#
-# assert newRoadSystem(
-#     [
-#         [False, True, False, False, False, False, False],
-#         [True, False, False, False, False, False, False],
-#         [False, False, False, True, False, False, False],
-#         [False, False, True, False, False, False, False],
-#         [False, False, False, False, False, False, True],
-#         [False, False, False, False, True, False, False],
-#         [False, False, False, False, False, True, False]
-#     ]
-# ) is True
-#
-# assert newRoadSystem(
-#     [
-#         [False, True, False],
-#         [False, False, False],
-#         [True, False, False]
-#     ]
-# ) is False
-#
-# assert newRoadSystem(
-#     [
-#         [False, False, False, False],
-#         [False, False, False, False],
-#         [False, False, False, False],
-#         [False, False, False, False]
-#     ]
-# ) is True
-#
-# assert newRoadSystem(
-#     [
-#         [False]
-#     ]
-# ) is True
+assert newRoadSystem(
+    [
+        [False, True, False, False],
+        [False, False, True, False],
+        [True, False, False, True],
+        [False, False, True, False]
+    ]
+) is True
+
+assert newRoadSystem(
+    [
+        [False, True, False, False, False, False, False],
+        [True, False, False, False, False, False, False],
+        [False, False, False, True, False, False, False],
+        [False, False, True, False, False, False, False],
+        [False, False, False, False, False, False, True],
+        [False, False, False, False, True, False, False],
+        [False, False, False, False, False, True, False]
+    ]
+) is True
+
+assert newRoadSystem(
+    [
+        [False, True, False],
+        [False, False, False],
+        [True, False, False]
+    ]
+) is False
+
+assert newRoadSystem(
+    [
+        [False, False, False, False],
+        [False, False, False, False],
+        [False, False, False, False],
+        [False, False, False, False]
+    ]
+) is True
+
+assert newRoadSystem(
+    [
+        [False]
+    ]
+) is True
 
 assert newRoadSystem(
     [
@@ -139,36 +155,36 @@ assert newRoadSystem(
     ]
 ) is False
 
-# assert newRoadSystem(
-#     [
-#         [False, True, True, True, True],
-#         [True, False, True, True, True],
-#         [True, True, False, True, True],
-#         [True, True, True, False, True],
-#         [True, True, True, True, False]
-#     ]
-# ) is True
-#
-# assert newRoadSystem(
-#     [
-#         [False, True, False, True, True],
-#         [False, False, False, False, True],
-#         [True, False, False, True, True],
-#         [True, True, True, False, False],
-#         [True, True, True, False, False]
-#     ]
-# ) is False
-#
-# assert newRoadSystem(
-#     [
-#         [False, True, True, False, True],
-#         [True, False, False, True, False],
-#         [False, True, False, True, False],
-#         [True, True, True, False, True],
-#         [True, True, False, False, False]
-#     ]
-# ) is False
-#
+assert newRoadSystem(
+    [
+        [False, True, True, True, True],
+        [True, False, True, True, True],
+        [True, True, False, True, True],
+        [True, True, True, False, True],
+        [True, True, True, True, False]
+    ]
+) is True
+
+assert newRoadSystem(
+    [
+        [False, True, False, True, True],
+        [False, False, False, False, True],
+        [True, False, False, True, True],
+        [True, True, True, False, False],
+        [True, True, True, False, False]
+    ]
+) is False
+
+assert newRoadSystem(
+    [
+        [False, True, True, False, True],
+        [True, False, False, True, False],
+        [False, True, False, True, False],
+        [True, True, True, False, True],
+        [True, True, False, False, False]
+    ]
+) is False
+
 # assert newRoadSystem(
 #     [
 #         [False, True, False, True, True],

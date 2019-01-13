@@ -27,11 +27,11 @@ def newRoadSystem(road_register: list) -> bool:
     return is_connected
 
 
-def broken_routes(routes: list) -> bool:
+def broken_routes(routes: dict) -> bool:
     """
     Check if the routes are broken; looking for an empty list.
 
-    :type routes: list
+    :type routes: dict
     :param routes: List of the connected nodes.
     :rtype: bool
     :return: True if the routes are broken otherwise false
